@@ -12,6 +12,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
+import edu.wpi.first.wpilibj.Timer;
 
 
 /**
@@ -27,9 +28,9 @@ public class Robot extends TimedRobot {
    */
   private XboxController controller = new XboxController(0);
 
-  private TalonSRX ArmsRoller = new TalonSRX(6);
-  private TalonSRX Handler = new TalonSRX(5);
-  private TalonSRX Shooter = new TalonSRX(4);
+  private TalonSRX armsRoller = new TalonSRX(6);
+  private TalonSRX handler = new TalonSRX(5);
+  private TalonSRX shooter = new TalonSRX(4);
 
   private TalonSRX leftMotor1 = new TalonSRX(0);
   private TalonSRX leftMotor2 = new TalonSRX(1);
@@ -49,20 +50,14 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {}
 
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+  }
 
   @Override
   public void teleopPeriodic() {
-    double turn = controller.getRightX() * 0.5;
-    double speed = controller.getLeftY() * 0.5;
-
-    double left = speed + turn;
-    double right = speed - turn;
-
-    leftMotor1.set(ControlMode.PercentOutput, left);
-    leftMotor2.set(ControlMode.PercentOutput, left);
-    rightMotor1.set(ControlMode.PercentOutput, -right);
-    rightMotor2.set(ControlMode.PercentOutput, -right);
+    drive();
+    intake();
+    shoot();
   }
   @Override
   public void disabledInit() {}
@@ -75,4 +70,35 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic() {}
+
+  public void drive(){
+    double turn = controller.getRightX() * 0.5;
+    double speed = controller.getLeftY() * 0.5;
+
+    double left = speed + turn;
+    double right = speed - turn;
+
+    leftMotor1.set(ControlMode.PercentOutput, left);
+    leftMotor2.set(ControlMode.PercentOutput, left);
+    rightMotor1.set(ControlMode.PercentOutput, -right);
+    rightMotor2.set(ControlMode.PercentOutput, -right);
+  }
+  public void intake(){
+    if (controller.getAButton()){
+      armsRoller.set(ControlMode.PercentOutput, 0.5);
+      handler.set(ControlMode.PercentOutput, 0.4);
+    } else {
+      armsRoller.set(ControlMode.PercentOutput, 0);
+      handler.set(ControlMode.PercentOutput, 0);
+    }
+  }
+  public void shoot(){
+    if (controller.getBButton()){
+      handler.set(ControlMode.PercentOutput, 0.5);
+      shooter.set(ControlMode.PercentOutput, 0.7);
+    } else {
+      handler.set(ControlMode.PercentOutput, 0);
+      shooter.set(ControlMode.PercentOutput, 0);
+    }
+  }
 }
